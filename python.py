@@ -28,8 +28,22 @@ def fetch_data(conn, query):
         st.error(f"Error fetching data: {e}")
         return None
 
-# Streamlit App
-def main():
+# Login Page
+def login_page():
+    st.title("🔐 Login")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        # Hardcoded credentials for demonstration
+        if username == "admin" and password == "password":
+            st.session_state.logged_in = True
+            st.success("Login successful! Redirecting to the dashboard...")
+        else:
+            st.error("Invalid username or password. Please try again.")
+
+# Main Dashboard
+def main_dashboard():
     st.title("📊 Employee Data Visualization Dashboard")
     st.markdown("Welcome to the interactive employee data visualization dashboard! Use the sidebar filters to explore the data.")
 
@@ -65,6 +79,7 @@ def main():
             # Calculate tenure (in years)
             if "hire_date" in df.columns and "last_date" in df.columns:
                 df["tenure"] = (df["last_date"].fillna(pd.Timestamp.today()) - df["hire_date"]).dt.days / 365
+
             # Custom CSS to reduce font size of metrics
             st.markdown("""
                 <style>
@@ -414,4 +429,11 @@ def main():
 
 # Run the app
 if __name__ == "__main__":
-    main()
+    # Check if the user is logged in
+    if "logged_in" not in st.session_state:
+        st.session_state.logged_in = False
+
+    if not st.session_state.logged_in:
+        login_page()
+    else:
+        main_dashboard()
